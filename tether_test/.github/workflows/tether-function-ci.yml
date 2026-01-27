@@ -1,0 +1,13 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  call-template:
+    uses: maksim-sialitski-innowise/devops-automation/integration/templates/function-template.yml@main
+    with:
+      name: "Example run"
