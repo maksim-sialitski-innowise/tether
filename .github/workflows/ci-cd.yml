@@ -1,0 +1,54 @@
+# tether/.github/workflows/ci-cd.yml
+name: CI/CD Pipeline
+
+# Trigger rules including label-based triggers
+on:
+  pull_request:
+    types: [labeled, unlabeled, opened, synchronize, reopened]
+  push:
+    branches: [main]
+  workflow_dispatch: # Optional, for manual trigger
+
+# All jobs declared below will run
+jobs:
+  # ---------- 1. Basic PR verification (runs on every PR) ----------
+  pr-verification:
+    if: github.event_name == 'pull_request'
+    # Uses reusable workflow from devops-automation repo
+    uses: maksim-sialitski-innowise/devops-automation/.github/workflows/pr-verification.yml@main
+    with:
+      node-version: '20'
+
+  # ---------- 2. Integration tests (only with 'verify' label) ----------
+  integration-tests:
+    if: |
+      github.event_name == 'pull_request' &&
+      contains(github.event.pull_request.labels.*.name, 'verify')
+    needs: pr-verification # Wait for basic checks to complete
+    uses: maksim-sialitski-innowise/devops-automation/.github/workflows/verify-label.yml@main
+    with:
+      node-version: '20'
+
+  # ---------- 3. Create Release Candidate (only with 'publish' label) ----------
+  release-candidate:
+    if: |
+      github.event_name == 'pull_request' &&
+      contains(github.event.pull_request.labels.*.name, 'publish')
+    needs: [pr-verification, integration-tests] # Wait for previous steps
+    uses: maksim-sialitski-innowise/devops-automation/.github/workflows/publish-label.yml@main
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # Pass token for NPM version check
+
+  # ---------- 4. Final publication (after merge to main) ----------
+  publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: release-candidate
+    uses: maksim-sialitski-innowise/devops-automation/.github/workflows/publish-release.yml@main
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ---------- 5. Automatic branch protection setup (optional) ----------
+  setup-branch-protection:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: maksim-sialitski-innowise/devops-automation/.github/workflows/setup-branch-protection.yml@main
