@@ -46,9 +46,4 @@ jobs:
     uses: maksim-sialitski-innowise/devops-automation/.github/workflows/publish-release.yml@main
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # ---------- 5. Automatic branch protection setup (optional) ----------
-  setup-branch-protection:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    uses: maksim-sialitski-innowise/devops-automation/.github/workflows/setup-branch-protection.yml@main
+      RELEASE_TOKEN: ${{ secrets.GITHUB_TOKEN }}

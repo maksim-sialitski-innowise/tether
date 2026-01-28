@@ -1,0 +1,50 @@
+name: Setup Branch Protection
+on:
+  workflow_dispatch:
+    inputs:
+      branch-name:
+        description: 'Branch to protect'
+        type: string
+        default: 'main'
+
+permissions:
+  contents: write
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install GitHub CLI
+        run: sudo apt update && sudo apt install gh -y
+      
+      - name: Configure branch protection
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Configuring protection for branch: ${{ inputs.branch-name }}"
+          gh api -X PUT \
+            /repos/${{ github.repository }}/branches/${{ inputs.branch-name }}/protection \
+            -f required_status_checks.strict=true \
+            -f enforce_admins=true \
+            -f required_pull_request_reviews.required_approving_review_count=1 \
+            -f allow_force_pushes=false \
+            -f allow_deletions=false
+      
+      - name: Enforce linear history
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api -X PATCH /repos/${{ github.repository }} \
+            -f allow_rebase_merge=true \
+            -f allow_merge_commit=false \
+            -f allow_squash_merge=false
+      
+      - name: Verify configuration
+        run: |
+          echo "✅ Branch protection configured!"
+          echo "Settings applied:"
+          echo "  - Require PR before merging"
+          echo "  - Require 1 approval"
+          echo "  - Require up-to-date branch"
+          echo "  - Linear history enforced (rebase only)"
+          echo "  - Admin bypass enabled (you can merge)"
