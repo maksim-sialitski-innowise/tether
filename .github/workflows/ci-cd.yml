@@ -46,4 +46,4 @@ jobs:
     uses: maksim-sialitski-innowise/devops-automation/.github/workflows/publish-release.yml@main
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RELEASE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
