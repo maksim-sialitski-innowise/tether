@@ -261,13 +261,10 @@ bash
 # 2. Push directly to main
 # 3. Re-enable protection
 # 4. Create follow-up PR to fix pipeline
+
 Support
 For pipeline issues, check:
-
 GitHub Actions logs
-
 npm audit results
-
 TypeScript compilation errors
-
 Test execution reports
