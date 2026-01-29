@@ -1,20 +1,17 @@
 # tether/.github/workflows/ci-cd.yml
 name: CI/CD Pipeline
 
-# Trigger rules including label-based triggers
 on:
   pull_request:
-    types: [labeled, unlabeled, opened, synchronize, reopened]
+    types: [labeled, unlabeled, opened, synchronize, reopened, closed]
   push:
     branches: [main]
   workflow_dispatch: # Optional, for manual trigger
 
-# All jobs declared below will run
 jobs:
   # ---------- 1. Basic PR verification (runs on every PR) ----------
   pr-verification:
     if: github.event_name == 'pull_request'
-    # Uses reusable workflow from devops-automation repo
     uses: maksim-sialitski-innowise/devops-automation/.github/workflows/pr-verification.yml@main
     with:
       node-version: '20'
@@ -36,14 +33,22 @@ jobs:
       contains(github.event.pull_request.labels.*.name, 'publish')
     needs: [pr-verification, integration-tests] # Wait for previous steps
     uses: maksim-sialitski-innowise/devops-automation/.github/workflows/publish-label.yml@main
+    with:
+      node-version: '20'
+      add-dev-suffix: true
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # Pass token for NPM version check
 
-  # ---------- 4. Final publication (after merge to main) ----------
+  # ---------- 4. Release on Merge (when PR with 'publish' label is merged) ----------
   publish:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: |
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      github.event.head_commit.message =~ /^Merge pull request #\d+/
     uses: maksim-sialitski-innowise/devops-automation/.github/workflows/main-publish.yml@main
     with:
       node-version: '20'
+      target-version: ${{ needs.release-candidate.outputs.package-version }}
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
