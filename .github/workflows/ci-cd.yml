@@ -41,10 +41,7 @@ jobs:
 
   # ---------- 4. Release on Merge (when PR with 'publish' label is merged) ----------
   publish:
-    if: |
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/main' &&
-      startsWith(github.event.head_commit.message, 'Merge pull request')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: maksim-sialitski-innowise/devops-automation/.github/workflows/main-publish.yml@main
     with:
       node-version: '20'
