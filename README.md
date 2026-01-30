@@ -1,36 +1,48 @@
 # Tether - CI/CD Pipeline Implementation
 
-A TypeScript package demonstrating a fully automated CI/CD pipeline with GitHub Actions.
+A TypeScript project demonstrating a fully automated CI/CD pipeline with reusable GitHub Actions workflows, semantic release practices, and branch protection rules.
 
-Quick Start:
+## 🚀 Quick Start
 
-Development
+### Development
+
 npm install
+
 npm run build
+
 npm test
 
-Release Process
-Create PR with version bump in package.json
-Add publish label to generate release candidate
-Merge PR → automatic npm publish + GitHub release
+## 🛠 Features
+✅ Fully automated CI/CD pipeline using GitHub Actions
 
-CI/CD Pipeline
-Workflows
-PR Verification: Linting, building, testing on every PR
-Label-Driven: verify for integration tests, publish for release candidates
-Auto-Publish: Automatic npm publish on merge to main
+🔁 Reusable workflows for verification and release processes
 
-Versioning
-Pre-merge: X.Y.Z-dev-<sha> (development)
-Post-merge: X.Y.Z (production, npm @latest)
+📦 Semantic versioning and automated releases
 
-Tech Stack
-TypeScript
-Jest (testing)
-ESLint (linting)
-GitHub Actions (CI/CD)
-npm (package registry)
+🧪 Linting, unit, integration, and E2E tests
 
-Configuration
-.github/workflows/ci-cd.yml - Main pipeline
-Reusable workflows from devops-automation repository
+🔐 Branch protection rules and pull request label enforcement
+
+## 🧩 CI/CD Workflow Logic
+The pipeline behavior is controlled via pull request labels:
+
+verify — runs integration and E2E tests
+
+publish — prepares a release candidate and publishes artifacts
+
+verify + publish — performs full validation and release flow
+
+## 📁 Project Structure
+.github/workflows/   # CI/CD workflows
+
+src/                 # Application source code
+
+tests/               # Unit and integration tests
+
+package.json         # Project configuration
+
+tsconfig.json        # TypeScript configuration
+
+## 🤝 Contributing
+Contributions are welcome.
+Please follow semantic commit conventions, keep your branch up to date, and use pull request labels to trigger the appropriate workflows.
