@@ -1,6 +1,6 @@
 {
   "name": "simple-ts-sum",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "TypeScript package with sum function for CI/CD demo",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
